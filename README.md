@@ -75,7 +75,7 @@ farmdine-backend is open to contributions, but I recommend creating an issue or 
 
 ## Contribution Guidelines
 
-1. Clone the repo `git clone https://github.com/InternPulse/farmdine-backendd.git`.
+1. Clone the repo `git clone https://github.com/InternPulse/farmdine-backend.git`.
 2. Open your terminal & set the origin branch: `git remote add origin https://github.com/InternPulse/farmdine-backend.git`
 3. Pull origin `git pull origin dev`
 4. Create a new branch for the task you were assigned to, eg `TicketNumber/(Feat/Bug/Fix/Chore)/Ticket-title` : `git checkout -b BA-001/Feat/Sign-Up-from`
