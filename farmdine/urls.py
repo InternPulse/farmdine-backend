@@ -15,8 +15,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from products.views import ProductListCreate, ProductDetail
+from comments.views import CommentCreate
+from likes.views import LikeCreate, LikeDelete
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/', include('products.urls')),
+    path('api/', include('comments.urls')),
+    path('api/events/<int:event_id>/comments/', CommentCreate.as_view(), name='comment-create'),
 ]
