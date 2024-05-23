@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser, VendorUser, RestaurantUser
+from .models import CustomUser, VendorProfile, RestaurantProfile
 
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
@@ -20,5 +20,5 @@ class CustomUserAdmin(UserAdmin):
     ordering = ('date_joined',)
 
 admin.site.register(CustomUser, CustomUserAdmin)
-admin.site.register(VendorUser)
-admin.site.register(RestaurantUser)
+admin.site.register(VendorProfile)
+admin.site.register(RestaurantProfile)
