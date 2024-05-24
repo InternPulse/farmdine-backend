@@ -1,16 +1,17 @@
 from rest_framework import status
 from django.db import transaction
+from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.exceptions import TokenError
-from .serializers import CustomUserSerializer, VendorProfileSerializer, RestaurantProfileSerializer
+from .serializers import CustomUserSerializer, VendorProfileSerializer, RestaurantProfileSerializer, LogoutSerializer
 from .models import CustomUser
 
 class VendorRegisterView(APIView):
     ''' Registers CustomUser and creates VendorProfile '''
+
     permission_classes = [AllowAny]
 
     @transaction.atomic
@@ -58,7 +59,7 @@ class VendorRegisterView(APIView):
 
 
 class RestaurantRegisterView(APIView):
-    ''' Registers CustomUser and creates VendorProfile '''
+    ''' Registers CustomUser and creates Restaurant Profile '''
     
     permission_classes = [AllowAny]
 
@@ -132,7 +133,7 @@ class LoginView(APIView):
         response = Response({
             'refresh': str(refresh),
             'access': str(refresh.access_token),
-        })
+        }, status=status.HTTP_200_OK)
         return response
     
 
@@ -168,16 +169,19 @@ class UserDetailView(APIView):
         user_instance = self.get_object()
         user_instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
 
-class LogoutView(APIView):
-    ''' Log CustomUser out '''
+
+
+class LogoutView(generics.GenericAPIView):
+    ''' Logs user out by blacklisting their refresh_token. '''
+    serializer_class = LogoutSerializer
+
     def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
         try:
-            refresh_token = request.data['refresh_token']
-            token = RefreshToken(refresh_token)
-            token.blacklist()
-            return Response({"message": "Successfully logged out."}, status=status.HTTP_200_OK)
-        except TokenError as e:
-            return Response({"message": "Invalid token.", "error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            serializer.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except ValidationError as e:
+            return Response(data={'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         

@@ -118,9 +118,8 @@ class LogoutViewTest(APITestCase):
 
     def test_logout(self):
         data = {
-            'refresh_token': str(self.refresh_token)
+            'refresh': str(self.refresh_token)
         }
         response = self.client.post(self.url, data, format='json')
-        print(response.data)  # Add this line to print the response data for debugging
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['message'], 'Successfully logged out.')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+

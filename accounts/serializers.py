@@ -1,7 +1,10 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework.validators import UniqueValidator
+from rest_framework.exceptions import ValidationError
 from .models import CustomUser, VendorProfile, RestaurantProfile
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
 
 class CustomUserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
@@ -53,6 +56,20 @@ class RestaurantProfileSerializer(serializers.ModelSerializer):
         model = RestaurantProfile
         fields = ['restaurant', 'business_name', 'restaurant_address']
 
+
+    
+class LogoutSerializer(serializers.Serializer):
+    refresh = serializers.CharField()
+
+    def validate(self, attrs):
+        self.token = attrs['refresh']
+        return attrs
+    
+    def save(self, **kwargs):
+        try:
+            RefreshToken(self.token).blacklist()
+        except TokenError:
+            raise ValidationError('Token is invalid or expired!')
 
 
 

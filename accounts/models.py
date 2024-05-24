@@ -12,7 +12,7 @@ class CustomUser(AbstractUser):
     is_vendor = models.BooleanField(default=False)
     is_restaurant = models.BooleanField(default=False)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
-    'other common fields'
+    # other common fields
 
     def __str__(self):
         return f'{self.email}'
@@ -31,6 +31,7 @@ class VendorProfile(models.Model):
     vendor = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True, blank=True)
     business_name = models.CharField(max_length=255)
     vendor_address = models.CharField(max_length=300)
+    # Other unique VendorProfile fields
 
     def __str__(self) -> str:
         return self.vendor.email
@@ -45,7 +46,8 @@ class RestaurantProfile(models.Model):
     restaurant = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True, blank=True)
     business_name = models.CharField(max_length=255)
     restaurant_address = models.CharField(max_length=300)  
-
+    # Other unique RestaurantProfile fields
+    
     def __str__(self) -> str:
         return self.restaurant.email
 
