@@ -9,40 +9,50 @@ class CustomUserSerializer(serializers.ModelSerializer):
         validators=[UniqueValidator(queryset=CustomUser.objects.all())]
     )
     password = serializers.CharField(write_only=True, required=True, min_length=8)
-    phone_number = serializers.CharField(required=False)
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'full_name', 'password', 'phone_number')
+        fields = ('username', 'email', 'first_name', 'last_name', 'password', 'phone_number')
 
     def create(self, validated_data):
-        user = CustomUser.objects.create_user(
-            email=validated_data['email'],
-            full_name=validated_data['full_name'],
-            password=validated_data['password'],
-            phone_number=validated_data['phone_number']
-        )
-        return user
+        password = validated_data.pop('password', None)
+        instance = self.Meta.model(**validated_data)
+        if password is not None:
+            instance.set_password(password)
+        instance.save()
+        return instance
+
+    def update(self, instance, validated_data):
+        # Update each field in the instance with the corresponding value in validated_data
+        instance.username = validated_data.get('username', instance.username)
+        instance.email = validated_data.get('email', instance.email)
+        instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.phone_number = validated_data.get('phone_number', instance.phone_number)
+
+        # Update password separately to ensure proper hashing
+        password = validated_data.get('password')
+        if password:
+            instance.set_password(password)
+
+        # Save the instance to update the user record
+        instance.save()
+        return instance
+
 
 
 class VendorProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = VendorProfile
-        fields = ['business_name', 'vendor_address']
+        fields = ['vendor', 'business_name', 'vendor_address']
+
 
 
 class RestaurantProfileSerializer(serializers.ModelSerializer):
-    restaurant = CustomUserSerializer()
-
     class Meta:
         model = RestaurantProfile
-        fields = ('restaurant', 'business_name', 'restaurant_address')
+        fields = ['restaurant', 'business_name', 'restaurant_address']
 
-    def create(self, validated_data):
-       user_data = validated_data.pop('restaurant') 
-       user = CustomUser.objects.create_user(**user_data, is_restaurant=True)
-       restaurant_profile = RestaurantProfile.objects.create(restaurant=user, **validated_data)
-       return restaurant_profile
 
 
 
