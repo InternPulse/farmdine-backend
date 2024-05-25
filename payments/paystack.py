@@ -4,7 +4,7 @@ import requests
 
 base_url = "https://api.paystack.co/transaction/"
 headers = {
-    "Authorization": f"Bearer {settings.PAYSTACK_SEC_KEY}",
+    "Authorization": f"Bearer {settings.PAYSTACK_SK}",
     "Content-Type": "application/json",
 }
 
@@ -17,10 +17,10 @@ def make_payment(payment):
         "reference": str(payment.id),
     }
     response = requests.post(url, headers=headers, json=data)
-    return response.json()
+    return response
 
 
 def verify_payment(reference):
     url = base_url + f"verify/{reference}"
     response = requests.get(url, headers=headers)
-    return response.json()
+    return response
