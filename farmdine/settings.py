@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -45,6 +46,7 @@ INSTALLED_APPS = [
     'products',
     'comments',
     'likes',
+    'payments',
 ]
 
 MIDDLEWARE = [
@@ -132,6 +134,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-    'rest_framework.permissions.AllowAny',
-]
+        'rest_framework.permissions.AllowAny',
+    ]
 }
+
+# Paystack API keys
+PAYSTACK_SEC_KEY = config('PAYSTACK_SK')
+PAYSTACK_PUB_KEY = config('PAYSTACK_PK')

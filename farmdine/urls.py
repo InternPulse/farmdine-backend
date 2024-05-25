@@ -20,9 +20,11 @@ from products.views import ProductListCreate, ProductDetail
 from comments.views import CommentCreate
 from likes.views import LikeCreate, LikeDelete
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('products.urls')),
     path('api/', include('comments.urls')),
     path('api/events/<int:event_id>/comments/', CommentCreate.as_view(), name='comment-create'),
+    path('api/', include('payments.urls')),
 ]
