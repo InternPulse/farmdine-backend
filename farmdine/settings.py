@@ -35,6 +35,8 @@ INSTALLED_APPS = [
 
     # Local apps
     'accounts.apps.AccountsConfig',
+    'vendor_verification',
+    'reviews',
 ]
 
 MIDDLEWARE = [
