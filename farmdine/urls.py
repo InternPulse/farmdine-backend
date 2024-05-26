@@ -14,4 +14,5 @@ urlpatterns = [
     # Accounts app
     path('api/accounts/', include('accounts.urls')),
     # Another app...
+    path('api/payments/', include('payments.urls')),
 ]
