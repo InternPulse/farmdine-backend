@@ -36,6 +36,8 @@ INSTALLED_APPS = [
 
     # Local apps
     'accounts.apps.AccountsConfig',
+    'vendor_verification',
+    'reviews',
     'payments.apps.PaymentsConfig',
 ]
 

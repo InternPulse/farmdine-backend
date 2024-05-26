@@ -1,6 +1,9 @@
-.venv
+venv
 .env
 db.sqlite3
 env/
 __pycache__/
 migrations/
+vendor_verification/migrations/
+reviews/migrations/
+farmdine/migrations/
