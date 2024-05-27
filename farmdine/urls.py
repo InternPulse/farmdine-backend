@@ -13,5 +13,7 @@ urlpatterns = [
     # APP urls
     # Accounts app
     path('api/accounts/', include('accounts.urls')),
+    path('api/cart/', include('cart.urls')),
+    path('api/order/', include('order.urls')),
     # Another app...
 ]
