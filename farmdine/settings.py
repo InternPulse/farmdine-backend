@@ -41,6 +41,9 @@ INSTALLED_APPS = [
     'vendor_verification',
     'reviews',
     'payments.apps.PaymentsConfig',
+    'products',
+    'likes',
+    'comments',
 ]
 
 MIDDLEWARE = [
