@@ -1,5 +1,6 @@
 from pathlib import Path
 from datetime import timedelta
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,6 +38,9 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'cart.apps.AccountsConfig',
     'order.apps.AccountsConfig',
+    'vendor_verification',
+    'reviews',
+    'payments.apps.PaymentsConfig',
 ]
 
 MIDDLEWARE = [
@@ -153,3 +157,7 @@ SIMPLE_JWT = {
 CORS_ALLOW_ALL_ORIGINS = True  # Remove in production
 CORS_ALLOW_CREDENTIALS = True
 
+
+# Paystack API Keys
+PAYSTACK_SK = config('PAYSTACK_SEC_KEY')
+PAYSTACK_PK = config('PAYSTACK_PUB_KEY')
