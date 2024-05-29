@@ -7,3 +7,4 @@ migrations/
 vendor_verification/migrations/
 reviews/migrations/
 farmdine/migrations/
+venv
