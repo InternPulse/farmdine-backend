@@ -1,18 +1,31 @@
-from rest_framework import generics
-from rest_framework.response import Response
 from rest_framework import status
-from orders.models import Order
-from .serializers import OrderSerializer
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .models import Logistics
+from .serializers import LogisticsSerializer
 
-class OrderDetailView(generics.RetrieveUpdateAPIView):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializer
-    lookup_field = 'order_id'
+@api_view(['GET'])
+def get_logistics_details(request, order_id):
+    try:
+        logistics = Logistics.objects.get(order_id=order_id)
+        serializer = LogisticsSerializer(logistics)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Logistics.DoesNotExist:
+        return Response({"error": "Logistics details not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    def put(self, request, *args, **kwargs):
-        order = self.get_object()
-        serializer = self.get_serializer(order, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+@api_view(['PUT'])
+def update_logistics_status(request, order_id):
+    try:
+        logistics = Logistics.objects.get(order_id=order_id)
+    except Logistics.DoesNotExist:
+        return Response({"error": "Logistics details not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    new_status = request.data.get('status')
+    if new_status not in dict(Logistics.STATUS_CHOICES).keys():
+        return Response({"error": "Invalid status"}, status=status.HTTP_400_BAD_REQUEST)
+
+    logistics.status = new_status
+    logistics.save()
+    serializer = LogisticsSerializer(logistics)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+

@@ -1,25 +1,40 @@
-from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APIClient
-from orders.models import Order
+from rest_framework.test import APITestCase
+from order.models import Order
+from logistics.models import Logistics
+from accounts.models import CustomUser
+import uuid
 
-class OrderAPITests(TestCase):
+class LogisticsTests(APITestCase):
+
     def setUp(self):
-        self.client = APIClient()
-        self.order = Order.objects.create(order_id='12345', status='in_progress')
+        self.user = CustomUser.objects.create_user(username='testuser', password='testpassword')
+        self.client.login(username='testuser', password='testpassword')
+        self.order = Order.objects.create(user=self.user, total_amount=100)
+        self.logistics = Logistics.objects.create(order=self.order, status=Logistics.PENDING)
 
-    def test_get_order_by_id(self):
-        url = reverse('order-detail', kwargs={'order_id': self.order.order_id})
+    def test_get_logistics_details(self):
+        url = reverse('get_logistics_details', args=[self.order.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['order_id'], self.order.order_id)
-        self.assertEqual(response.data['status'], self.order.status)
+        self.assertEqual(str(response.data['order']), str(self.order.id))
 
-    def test_update_order_status(self):
-        url = reverse('order-detail', kwargs={'order_id': self.order.order_id})
-        data = {'status': 'done'}
+    def test_update_logistics_status(self):
+        url = reverse('update_logistics_status', args=[self.order.id])
+        data = {'status': Logistics.IN_TRANSIT}
         response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.order.refresh_from_db()
-        self.assertEqual(self.order.status, 'done')
+        self.logistics.refresh_from_db()
+        self.assertEqual(self.logistics.status, Logistics.IN_TRANSIT)
+
+    def test_get_logistics_details_not_found(self):
+        url = reverse('get_logistics_details', args=[uuid.uuid4()])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_update_logistics_status_invalid_status(self):
+        url = reverse('update_logistics_status', args=[self.order.id])
+        data = {'status': 'InvalidStatus'}
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

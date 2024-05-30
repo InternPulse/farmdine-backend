@@ -1,7 +1,8 @@
 from rest_framework import serializers
-from orders.models import Order
+from .models import Logistics
 
-class OrderSerializer(serializers.ModelSerializer):
+
+class LogisticsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Order
-        fields = ['order_id', 'status', 'created_at', 'updated_at']
+        model = Logistics
+        fields = ['id', 'order', 'status', 'updated_at']
