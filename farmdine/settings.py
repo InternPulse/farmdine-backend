@@ -2,24 +2,18 @@ from pathlib import Path
 from datetime import timedelta
 from decouple import config
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-t&3f4^*$+zxk0zzmg$exb#q3)^@pku2i9676-10@ietkn8d(%-'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Switch to True in development
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -83,12 +77,24 @@ WSGI_APPLICATION = 'farmdine.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if DEBUG is True:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": config('DATABASE_NAME'),
+            "USER": config('DATABASE_USER'),
+            "PASSWORD": config('DATABASE_PASSWORD'),
+            "HOST": config('DATABASE_HOST'),
+            "PORT": config('DATABASE_PORT'),
+        }
+    }
 
 
 # Password validation
