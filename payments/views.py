@@ -24,6 +24,7 @@ class MakePaymentView(generics.CreateAPIView):
 
 
 class VerifyPaymentView(generics.ListAPIView):
+    serializer_class = PaymentSerializer
     def get(self, request, reference):
         # call the verify_pament fuction
         payment_status = verify_payment(reference)
