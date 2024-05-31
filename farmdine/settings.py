@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
+    'drf_yasg',
 
     # Local apps
     'accounts.apps.AccountsConfig',
@@ -143,10 +144,12 @@ REST_FRAMEWORK = {
     ],
 }
 
+
 AUTHENTICATION_BACKENDS = [
     'accounts.authentication_backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',  # fallback to default 
 ]
+
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
