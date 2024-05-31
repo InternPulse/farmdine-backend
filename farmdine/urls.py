@@ -37,11 +37,11 @@ urlpatterns = [
     path('api/order/', include('order.urls')),
     path('api/payments/', include('payments.urls')),
     #Products app
-    path('products/', include('products.urls')),
+    path('api/products/', include('products.urls')),
     #Comments app
-    path('comments/', include('comments.urls')),
+    path('api/comments/', include('comments.urls')),
     #Likes app
-    path('likes/', include('likes.urls')),
+    path('api/likes/', include('likes.urls')),
     #logistics app
     path('api/logistics/', include('logistics.urls')),
     # review app
