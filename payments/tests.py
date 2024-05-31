@@ -11,6 +11,7 @@ class MakePaymentTestCase(TestCase):
     # Valid make payment data
     def test_make_payment_success(self):
         valid_data = {
+            'cart_items_id': 'ff8d037b-c502-4473-a8fa-65b8186361a6',
             'email': 'johndoe@example.com',
             'payment_amount': 20500,
         }
@@ -25,6 +26,7 @@ class MakePaymentTestCase(TestCase):
     # Invalid make payment data (validate email field)
     def test_make_payment_invalid_email(self):
         invalid_data = {
+            'cart_items_id': 'ff8d037b-c502-4473-a8fa-65b8186361a6',
             'email': 'johndoe.example.com',
             'payment_amount': 5000,
         }
@@ -36,7 +38,7 @@ class MakePaymentTestCase(TestCase):
         }
         self.assertEqual(response.data, expected_error)
 
-    # Invalid make payment data (missing required field 'payment_amount')
+    # Invalid make payment data (missing required field 'cart_items_id, and payment_amount')
     def test_make_payment_required_data(self):
         invalid_data = {
             'email': 'johndoe@example.com'
@@ -45,6 +47,7 @@ class MakePaymentTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         # Check if the expected error message is returned
         expected_error = {
+            "cart_items_id": ["This field is required."],
             "payment_amount": ["This field is required."]
         }
         self.assertEqual(response.data, expected_error)
@@ -54,11 +57,12 @@ class VerifyPaymentTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
         valid_data = {
+            'cart_items_id': 'ff8d037b-c502-4473-a8fa-65b8186361a6',
             'email': 'dave@example.com',
             'payment_amount': 1500
         }
         response = self.client.post('/api/payments/make-payment/', valid_data, format='json')
-        self.paystack_ref = response.data["data"]['reference']
+        self.paystack_ref = response.json()['data']['reference']
 
     # Validate payment data
     def test_validate_payment(self):
