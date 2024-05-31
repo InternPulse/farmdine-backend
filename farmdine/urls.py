@@ -13,12 +13,16 @@ urlpatterns = [
     # APP urls
     # Accounts app
     path('api/accounts/', include('accounts.urls')),
+    path('api/cart/', include('cart.urls')),
+    path('api/order/', include('order.urls')),
     # Another app...
-    path('api/payments/', include('payments.urls')),
+    #path('api/payments/', include('payments.urls')),
     #Products app
     path('products/', include('products.urls')),
     #Comments app
     path('comments/', include('comments.urls')),
     #Likes app
     path('likes/', include('likes.urls')),
+    #logistics app
+    path('api/logistics/', include('logistics.urls')),
 ]
