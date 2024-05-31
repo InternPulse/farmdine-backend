@@ -8,6 +8,7 @@ from cart.services import get_cart_details
 from .serializers import OrderDetailsSerializer, OrderSerializer
 from .models import Order, OrderDetails
 from products.models import Product
+from drf_yasg.utils import swagger_auto_schema
 
 
 # Create your views here.
@@ -26,6 +27,8 @@ def create_order_view(request):
         return Response({"error": "Cart is empty"}, status=status.HTTP_404_NOT_FOUND)
 
 
+@swagger_auto_schema(method='patch', request_body=OrderSerializer, 
+                     responses={200: 'OK', 400: 'Bad Request'})
 @api_view(['PATCH'])
 def update_order_status(request, order_id):
     """This function updates the delivery status of an order"""
@@ -43,6 +46,8 @@ def update_order_status(request, order_id):
     return Response(serializer.data, 200)
 
 
+@swagger_auto_schema(method='get', query_serializer=OrderSerializer, 
+                     responses={200: 'OK', 404: 'Not Found'})
 @api_view(['GET'])
 def get_orders_by_users(request, user_id):
     """This function retrieves users order based on thmeir id"""
@@ -54,6 +59,8 @@ def get_orders_by_users(request, user_id):
         return Response({"error": "Orders not found"}, status=status.HTTP_404_NOT_FOUND)
     
 
+@swagger_auto_schema(method='get', query_serializer=OrderSerializer, 
+                     responses={200: 'OK', 400: 'Bad Request'})
 @api_view(['GET'])
 def get_order_by_id(request, order_id):
     try:
@@ -65,6 +72,8 @@ def get_order_by_id(request, order_id):
         return Response({"error": "Order not found"}, status=status.HTTP_404_NOT_FOUND)
     
 
+@swagger_auto_schema(method='patch', request_body=OrderSerializer, 
+                     responses={200: 'OK', 400: 'Bad Request'})
 @api_view(['PATCH'])
 def cancel_order(request, order_id):
     try:

@@ -44,4 +44,9 @@ urlpatterns = [
     path('likes/', include('likes.urls')),
     #logistics app
     path('api/logistics/', include('logistics.urls')),
+    # review app
+    path('api/reviews/', include('reviews.urls')),
+    # vendor_verification app
+    path('api/vendor_verification/', include('vendor_verification.urls')),
+    
 ]

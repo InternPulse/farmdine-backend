@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
+from drf_yasg.utils import swagger_auto_schema
 from .serializers import CustomUserSerializer, VendorProfileSerializer, RestaurantProfileSerializer, LoginSerializer, LogoutSerializer
 from .models import CustomUser
 
@@ -14,6 +15,13 @@ class VendorRegisterView(APIView):
 
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(
+        request_body=CustomUserSerializer,
+        responses={
+            201: VendorProfileSerializer,
+            400: 'Bad Request'
+        }
+    )
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         # Make request.data (a QueryDict) mutable by creating a copy of it
@@ -63,6 +71,13 @@ class RestaurantRegisterView(APIView):
     
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(
+        request_body=CustomUserSerializer,
+        responses={
+            201: RestaurantProfileSerializer,
+            400: 'Bad Request'
+        }
+    )
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         # Make request.data (a QueryDict) mutable by creating a copy of it
@@ -110,6 +125,13 @@ class LoginView(APIView):
 
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(
+        request_body=LoginSerializer,
+        responses={
+            200: 'OK',
+            400: 'Bad Request'
+        }
+    )
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -147,11 +169,13 @@ class UserDetailView(APIView):
     def get_object(self):
         return self.request.user
 
+    @swagger_auto_schema(query_serializer=CustomUserSerializer, responses={200: CustomUserSerializer, 404: 'Not Found'})
     def get(self, request, *args, **kwargs):
         user_instance = self.get_object()
         serializer = self.serializer_class(user_instance)
         return Response(serializer.data)
 
+    @swagger_auto_schema(request_body=CustomUserSerializer, responses={200: 'OK', 400: 'Bad Request'})
     def put(self, request, *args, **kwargs):
         ''' Updates Only CustomUser. Doesn't Update VendorProfile or Restaurant Profile'''
         user_instance = self.get_object()
@@ -162,6 +186,7 @@ class UserDetailView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    @swagger_auto_schema(request_body=CustomUserSerializer, responses={204: 'No Content', 400: 'Bad Request'})
     def delete(self, request, *args, **kwargs):
         user_instance = self.get_object()
         user_instance.delete()
