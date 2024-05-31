@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import CustomUserSerializer, VendorProfileSerializer, RestaurantProfileSerializer, LogoutSerializer
+from .serializers import CustomUserSerializer, VendorProfileSerializer, RestaurantProfileSerializer, LoginSerializer, LogoutSerializer
 from .models import CustomUser
 
 class VendorRegisterView(APIView):
@@ -111,14 +111,11 @@ class LoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        try:
-            email = request.data['email']
-            password = request.data['password']
-        except KeyError:
-            raise AuthenticationFailed('Email and password are required.')
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        if not email or not password:
-            raise AuthenticationFailed('Email and password are required.')
+        email = serializer.validated_data['email']
+        password = serializer.validated_data['password']
 
         user = CustomUser.objects.filter(email=email).first()
         

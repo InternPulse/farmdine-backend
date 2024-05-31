@@ -70,6 +70,11 @@ class LogoutSerializer(serializers.Serializer):
             RefreshToken(self.token).blacklist()
         except TokenError:
             raise ValidationError('Token is invalid or expired!')
+        
+class LoginSerializer(serializers.Serializer):
+    ''' Serializer Login Data '''
+    email = serializers.EmailField()
+    password = serializers.CharField()
 
 
 
