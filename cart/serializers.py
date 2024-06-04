@@ -23,4 +23,4 @@ class CartItemSerializers(serializers.ModelSerializer):
 class CartDetailSerializer(serializers.Serializer):
     """Serializes cart details"""
     items = CartItemSerializers(many=True)
-    total_price = serializers.DecimalField(max_digits=10, decimal_places=2, )
+    total_price = serializers.DecimalField(max_digits=10, decimal_places=2)
