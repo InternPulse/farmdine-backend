@@ -16,7 +16,7 @@ urlpatterns = [
     # Another app...
     path('api/payments/', include('payments.urls')),
     #Products app
-    path('products/', include('products.urls')),
+    path('api/products/', include('products.urls')),
     #Comments app
     path('comments/', include('comments.urls')),
     #Likes app
