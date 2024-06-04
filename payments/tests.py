@@ -11,7 +11,10 @@ class MakePaymentTestCase(TestCase):
     # Valid make payment data
     def test_make_payment_success(self):
         valid_data = {
+            'cart_id': 'ea8aff82-f08b-4ef0-9a88-5756b12e4684',
             'email': 'johndoe@example.com',
+            'phone_number': '08078828296',
+            'address': 'adekunle str',
             'payment_amount': 20500,
         }
         response = self.client.post('/api/payments/make-payment/', valid_data, format='json')
@@ -25,7 +28,10 @@ class MakePaymentTestCase(TestCase):
     # Invalid make payment data (validate email field)
     def test_make_payment_invalid_email(self):
         invalid_data = {
+            'cart_id': 'ea8aff82-f08b-4ef0-9a88-5756b12e4684',
             'email': 'johndoe.example.com',
+            'phone_number': '08078828296',
+            'address': 'adekunle str',
             'payment_amount': 5000,
         }
         response = self.client.post('/api/payments/make-payment/', invalid_data, format='json')
@@ -36,15 +42,18 @@ class MakePaymentTestCase(TestCase):
         }
         self.assertEqual(response.data, expected_error)
 
-    # Invalid make payment data (missing required field 'payment_amount')
+    # Invalid make payment data (missing required field 'cart_items_id, and payment_amount')
     def test_make_payment_required_data(self):
         invalid_data = {
-            'email': 'johndoe@example.com'
+            'email': 'johndoe@example.com',
+            'phone_number': '08078828296',
+            'address': 'adekunle str'
         }
         response = self.client.post('/api/payments/make-payment/', invalid_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         # Check if the expected error message is returned
         expected_error = {
+            "cart_id": ["This field is required."],
             "payment_amount": ["This field is required."]
         }
         self.assertEqual(response.data, expected_error)
@@ -54,11 +63,15 @@ class VerifyPaymentTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
         valid_data = {
+            'cart_id': 'ea8aff82-f08b-4ef0-9a88-5756b12e4684',
             'email': 'dave@example.com',
-            'payment_amount': 1500
+            'phone_number': '08078828296',
+            'address': 'adekunle str',
+            'payment_amount': 20500,
         }
         response = self.client.post('/api/payments/make-payment/', valid_data, format='json')
-        self.paystack_ref = response.data["data"]['reference']
+        print(response.json())
+        self.paystack_ref = response.json()['data']['reference']
 
     # Validate payment data
     def test_validate_payment(self):
@@ -78,7 +91,7 @@ class VerifyPaymentTestCase(TestCase):
 
     # Invalid payment reference data
     def test_invalid_payment_ref(self):
-        reference = 'd7744225-cb24-42de-8754-ecc13af05ad66'
+        reference = 'ea8aff82-f08b-4ef0-9a88-5756b12e4684'
         response = self.client.get(f'/api/payments/verify-payment/{reference}/', format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         # Check if the expected error message is returned

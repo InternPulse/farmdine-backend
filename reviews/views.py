@@ -5,8 +5,11 @@ from .models import Review
 from .serializers import ReviewSerializer
 from products.models import Product
 from accounts.models import CustomUser
+from drf_yasg.utils import swagger_auto_schema
 
 
+@swagger_auto_schema(method='post', query_serializer=ReviewSerializer, 
+                     responses={200: 'OK', 400: 'Bad Request'})
 @api_view(['POST'])
 def create_review(request):
     serializer = ReviewSerializer(data=request.data)
@@ -16,6 +19,8 @@ def create_review(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@swagger_auto_schema(method='get', query_serializer=ReviewSerializer, 
+                     responses={200: ReviewSerializer, 404: 'Not Found'})
 @api_view(['GET'])
 def get_reviews_for_product(request, product_id):
     reviews = Review.objects.filter(product_id=product_id)
@@ -23,6 +28,8 @@ def get_reviews_for_product(request, product_id):
     return Response(serializer.data)
 
 
+@swagger_auto_schema(method='get', query_serializer=ReviewSerializer, 
+                     responses={200: ReviewSerializer, 404: 'Not Found'})
 @api_view(['GET'])
 def get_reviews_by_user(request, user_id):
     reviews = Review.objects.filter(user_id=user_id)
@@ -30,6 +37,8 @@ def get_reviews_by_user(request, user_id):
     return Response(serializer.data)
 
 
+@swagger_auto_schema(method='put', query_serializer=ReviewSerializer, 
+                     responses={200: 'OK', 400: 'Bad Request'})
 @api_view(['PUT'])
 def update_review(request, review_id):
     try:
