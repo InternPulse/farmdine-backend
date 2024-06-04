@@ -2,13 +2,16 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status, generics
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from .models import Cart, CartItems
 from .serializers import CartItemSerializers, CartSerializer
 from .services import add_to_cart, remove_from_cart, update_cart_item_quantity, clear_cart, get_cart_details
 from products.models import Product
+from rest_framework.permissions import AllowAny
+from .log import logger
 
 # Create your views here.
+@permission_classes([AllowAny])
 @api_view(['POST'])
 def add_to_cart_view(request, user_id):
     """This view logic handles addingv product to cart"""
@@ -26,9 +29,10 @@ def add_to_cart_view(request, user_id):
         return Response({"error":str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
 
+@permission_classes([AllowAny])
 @api_view(['DELETE'])
 def remove_from_cart_view(request, user_id):
-    """This view function handles removingv items from thme cart"""
+    """This view function handles removing items from thme cart"""
     try:
         product = request.data.get('product_id')
 
@@ -38,8 +42,12 @@ def remove_from_cart_view(request, user_id):
         return Response({"error": "Cart not found"}, status=status.HTTP_404_NOT_FOUND)
     except Product.DoesNotExist:
         return Response({"error": "Product not found"}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        logger.error(f"Error removing item from cart: {str(e)}")
+        return Response({"error": "An error occurred while removing the item from the cart"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 
+@permission_classes([AllowAny])
 @api_view(['PUT'])
 def update_cart_item_quantity_view(request, user_id):
     """This view function handles updating the product quantity on the cart"""
@@ -58,7 +66,7 @@ def update_cart_item_quantity_view(request, user_id):
         return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
     
 
-
+@permission_classes([AllowAny])
 @api_view(['DELETE'])
 def clear_cart_view(request, user_id):
     """This function clears the cart once an order is placed"""
@@ -69,7 +77,7 @@ def clear_cart_view(request, user_id):
         return Response({"error": "Cart not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
-
+@permission_classes([AllowAny])
 @api_view(['GET'])
 def view_cart(request, user_id):
     """View function to view cart details"""
