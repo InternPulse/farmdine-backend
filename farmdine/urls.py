@@ -24,29 +24,29 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
 
     # Simple-jwt urls
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/v1/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/v1/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     # API DOCS URL
     path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 
     # APP urls
-    path('api/accounts/', include('accounts.urls')),
-    path('api/cart/', include('cart.urls')),
-    path('api/order/', include('order.urls')),
-    path('api/payments/', include('payments.urls')),
+    path('api/v1/accounts/', include('accounts.urls')),
+    path('api/v1/cart/', include('cart.urls')),
+    path('api/v1/order/', include('order.urls')),
+    path('api/v1/payments/', include('payments.urls')),
     #Products app
-    path('api/products/', include('products.urls')),
+    path('api/v1/products/', include('products.urls')),
     #Comments app
-    path('api/comments/', include('comments.urls')),
+    path('api/v1/comments/', include('comments.urls')),
     #Likes app
-    path('api/likes/', include('likes.urls')),
+    path('api/v1/likes/', include('likes.urls')),
     #logistics app
-    path('api/logistics/', include('logistics.urls')),
+    path('api/v1/logistics/', include('logistics.urls')),
     # review app
-    path('api/reviews/', include('reviews.urls')),
+    path('api/v1/reviews/', include('reviews.urls')),
     # vendor_verification app
-    path('api/vendor_verification/', include('vendor_verification.urls')),
+    path('api/v1/vendor_verification/', include('vendor_verification.urls')),
     
 ]
