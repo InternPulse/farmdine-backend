@@ -28,6 +28,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'drf_yasg',
+    'cloudinary',
+    'cloudinary_storage',
 
     # Local apps
     'accounts.apps.AccountsConfig',
@@ -177,3 +179,14 @@ CORS_ALLOW_CREDENTIALS = True
 # Paystack API Keys
 PAYSTACK_SK = config('PAYSTACK_SEC_KEY')
 PAYSTACK_PK = config('PAYSTACK_PUB_KEY')
+
+
+# Cloudinary configuration
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": config("CLOUD_NAME"),
+    "API_KEY": config("API_KEY"),
+    "API_SECRET": config("API_SECRET"),
+}
+
+# Default file storage configuration
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
