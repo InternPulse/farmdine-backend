@@ -31,3 +31,6 @@ class CartItems(models.Model):
 
     def __str__(self):
         return f'{self.cart.user.username}'
+    
+    class Meta: 
+        verbose_name_plural = 'CartItems'
