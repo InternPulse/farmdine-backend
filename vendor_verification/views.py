@@ -56,7 +56,7 @@ def get_verification_status(request, user_id):
         verification = VendorVerification.objects.get(user_id=user_id)
     except VendorVerification.DoesNotExist:
         response_data = {
-            'success': True,
+            'success': False,
             'status': 404,
             'error': 'Not found',
             'message': 'Verification status not found.',     
