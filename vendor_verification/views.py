@@ -13,7 +13,13 @@ CustomUser = get_user_model()
                      responses={200: 'OK'})
 @api_view(['POST'])
 def request_verification(request):
-    ''' Checks if verification request exists. Creates verification request if not'''
+    """
+        Request vendor verification
+
+        Checks if verification request exists. Creates verification request if not 
+        and ensures that only Vendor users gets verified
+    """
+
     user = request.user
     # check if user is a vendor
     if not CustomUser.objects.filter(id=user.id, is_vendor=True).exists():
@@ -52,6 +58,11 @@ def request_verification(request):
                      responses={200: VendorVerificationSerializer})
 @api_view(['GET'])
 def get_verification_status(request, user_id):
+    """
+        GET verification status
+
+        Retrieves the status of Vendor verification request
+    """
     try:
         verification = VendorVerification.objects.get(user_id=user_id)
     except VendorVerification.DoesNotExist:

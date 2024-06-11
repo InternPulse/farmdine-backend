@@ -12,6 +12,11 @@ from drf_yasg.utils import swagger_auto_schema
                      responses={200: 'OK'})
 @api_view(['POST'])
 def create_review(request):
+    """
+        Create Review
+
+        Creates review of a product
+    """
     serializer = ReviewSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save(user=request.user)
@@ -37,6 +42,11 @@ def create_review(request):
                      responses={200: ReviewSerializer})
 @api_view(['GET'])
 def get_reviews_for_product(request, product_id):
+    """
+        GET reviews by product
+
+        Retrieves reviews by product
+    """
     reviews = Review.objects.filter(product_id=product_id)
     serializer = ReviewSerializer(reviews, many=True)
     response_data = {
@@ -53,6 +63,11 @@ def get_reviews_for_product(request, product_id):
                      responses={200: ReviewSerializer})
 @api_view(['GET'])
 def get_reviews_by_user(request, user_id):
+    """
+        GET reviews by user
+
+        Retrieves reviews of a user for products
+    """
     reviews = Review.objects.filter(user_id=user_id)
     serializer = ReviewSerializer(reviews, many=True)
     response_data = {
@@ -69,6 +84,11 @@ def get_reviews_by_user(request, user_id):
                      responses={200: 'OK'})
 @api_view(['PUT'])
 def update_review(request, review_id):
+    """
+        Update Review
+
+        Updates Review
+    """
     try:
         review = Review.objects.get(id=review_id)
     except Review.DoesNotExist:
@@ -112,6 +132,11 @@ def update_review(request, review_id):
 
 @api_view(['DELETE'])
 def delete_review(request, review_id):
+    """
+        Delete Review
+
+        Delete Review
+    """
     try:
         review = Review.objects.get(id=review_id)
     except Review.DoesNotExist:

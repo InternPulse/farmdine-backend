@@ -127,7 +127,11 @@ def clear_cart_view(request, user_id):
 @permission_classes([AllowAny])
 @api_view(['GET'])
 def view_cart(request, user_id):
-    """View function to view cart details"""
+    """
+        GET cart
+
+        Endpoint to retrieve cart details
+    """
     try:
         cart_details = get_cart_details(user_id)
         response_data = {
