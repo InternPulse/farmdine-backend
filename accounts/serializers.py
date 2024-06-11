@@ -63,6 +63,8 @@ class LogoutSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         self.token = attrs['refresh']
+        if not self.token:
+            raise ValidationError('No refresh token provided.')
         return attrs
     
     def save(self, **kwargs):

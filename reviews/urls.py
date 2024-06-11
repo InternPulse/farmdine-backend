@@ -21,11 +21,11 @@ urlpatterns = [
         get_reviews_by_user,
         name='get_reviews_by_user'),
     path(
-        '<int:review_id>',
+        'update/<int:review_id>',
         update_review,
         name='update_review'),
     path(
-        '<int:review_id>',
+        'delete/<int:review_id>',
         delete_review,
         name='delete_review'),
 ]

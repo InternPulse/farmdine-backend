@@ -21,7 +21,7 @@ class Order(models.Model):
     delivered = models.BooleanField(default=False)
 
     def __str__(self):
-        return f'{self.order_no} - {self.restaurantID.business_name}'
+        return f'{self.user.email}'
     
 
 class OrderDetails(models.Model):
@@ -34,5 +34,10 @@ class OrderDetails(models.Model):
 
     def __str__(self):
         return f'{self.productID.name} - {self.orderID}'
+    
+    class Meta:
+        verbose_name_plural = 'OrderDetails'
+    
+
 
 
