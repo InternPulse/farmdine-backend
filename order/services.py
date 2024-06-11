@@ -28,7 +28,7 @@ def create_order_from_cart(cart):
 
 
 def update_order_delivery(order, status):
-    """This function updates thme delivery status once an order is delivered"""
+    """This function updates the delivery status once an order is delivered"""
     order.delivered = status
     order.save()
 
