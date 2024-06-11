@@ -47,6 +47,6 @@ urlpatterns = [
     # review app
     path('api/v1/reviews/', include('reviews.urls')),
     # vendor_verification app
-    path('api/v1/vendor_verification/', include('vendor_verification.urls')),
+    path('api/v1/vendor-verification/', include('vendor_verification.urls')),
     
 ]
