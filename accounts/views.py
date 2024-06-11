@@ -3,7 +3,7 @@ from django.db import transaction
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
 from drf_yasg.utils import swagger_auto_schema
@@ -11,7 +11,12 @@ from .serializers import CustomUserSerializer, VendorProfileSerializer, Restaura
 from .models import CustomUser, VendorProfile, RestaurantProfile
 
 class VendorRegisterView(APIView):
-    ''' Registers CustomUser and creates VendorProfile '''
+    """
+        Register a Vendor User
+
+        Registers CustomUser and creates VendorProfile. 
+        Provide data for both models simultaneously
+    """
 
     permission_classes = [AllowAny]
 
@@ -70,7 +75,12 @@ class VendorRegisterView(APIView):
 
 
 class RestaurantRegisterView(APIView):
-    ''' Registers CustomUser and creates Restaurant Profile '''
+    """
+        Register a Restaurant User
+
+        Registers CustomUser and creates RestaurantProfile. 
+        Provide data for both models simultaneously
+    """
     
     permission_classes = [AllowAny]
 
@@ -126,8 +136,11 @@ class RestaurantRegisterView(APIView):
     
 
 class LoginView(APIView):
-    ''' CustomUser Email Login View '''
+    """
+        User Login
 
+        User logins with their email address
+    """
     permission_classes = [AllowAny]
 
     @swagger_auto_schema(
@@ -167,10 +180,11 @@ class LoginView(APIView):
 
 class UserDetailView(APIView):
     """
-    View to retrieve, update or delete a user instance.
-    - GET: Return the details of a specific CustomUser.
-    - PUT: Update a specific CustomUser.
-    - DELETE: Delete a specific CustomUser.
+        Endpoint to retrieve, update or delete a user instance.
+
+        - GET: Return the details of a specific CustomUser.
+        - PUT: Update a specific CustomUser.
+        - DELETE: Delete a specific CustomUser.
     """
     serializer_class = CustomUserSerializer
 
@@ -230,7 +244,7 @@ class UserDetailView(APIView):
 
     @swagger_auto_schema(request_body=CustomUserSerializer, responses={200: 'OK'})
     def put(self, request, *args, **kwargs):
-        ''' Updates Only CustomUser. Doesn't Update VendorProfile or Restaurant Profile'''
+        ''' Updates Only User data. Doesn't Update Vendor or Restaurant data '''
         user_instance = self.get_object()
         serializer = self.serializer_class(user_instance, data=request.data, partial=True)
         
@@ -261,7 +275,11 @@ class UserDetailView(APIView):
 
 
 class LogoutView(generics.GenericAPIView):
-    '''Logs user out by blacklisting their refresh_token.'''
+    """
+        User Logout
+
+        Logs user out by blacklisting their refresh token.
+    """
     serializer_class = LogoutSerializer
 
     def post(self, request):
