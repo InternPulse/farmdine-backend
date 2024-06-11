@@ -13,4 +13,4 @@ class Review(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Review by {self.user.username} on {self.product.name}"
+        return f"Review by {self.user.email} on {self.product.name}"
