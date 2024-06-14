@@ -6,6 +6,16 @@ from .serializers import LogisticsSerializer
 
 @api_view(['GET'])
 def get_logistics_details(request, order_id):
+    """
+    Retrieve logistics details for a specific order.
+
+    Args:
+        request: The HTTP request object.
+        order_id (int): The ID of the order to retrieve logistics details for.
+
+    Returns:
+        Response: A Response object containing the logistics details or an error message.
+    """
     try:
         logistics = Logistics.objects.get(order_id=order_id)
         serializer = LogisticsSerializer(logistics)
@@ -15,17 +25,26 @@ def get_logistics_details(request, order_id):
 
 @api_view(['PUT'])
 def update_logistics_status(request, order_id):
+    """
+    Update the logistics status for a specific order.
+
+    Args:
+        request: The HTTP request object containing the new status.
+        order_id (int): The ID of the order to update the logistics status for.
+
+    Returns:
+        Response: A Response object containing the updated logistics details or an error message.
+    """
     try:
         logistics = Logistics.objects.get(order_id=order_id)
     except Logistics.DoesNotExist:
         return Response({"error": "Logistics details not found"}, status=status.HTTP_404_NOT_FOUND)
 
     new_status = request.data.get('status')
-    if new_status not in dict(Logistics.STATUS_CHOICES).keys():
-        return Response({"error": "Invalid status"}, status=status.HTTP_400_BAD_REQUEST)
+    if not new_status or new_status not in dict(Logistics.STATUS_CHOICES).keys():
+        return Response({"error": "Invalid or missing status"}, status=status.HTTP_400_BAD_REQUEST)
 
     logistics.status = new_status
     logistics.save()
     serializer = LogisticsSerializer(logistics)
     return Response(serializer.data, status=status.HTTP_200_OK)
-
