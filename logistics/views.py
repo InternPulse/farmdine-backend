@@ -3,7 +3,10 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Logistics
 from .serializers import LogisticsSerializer
+from drf_yasg.utils import swagger_auto_schema
 
+@swagger_auto_schema(method='get', query_serializer=LogisticsSerializer, 
+                     responses={200: LogisticsSerializer, 400: 'Bad Request'})
 @api_view(['GET'])
 def get_logistics_details(request, order_id):
     """
@@ -23,6 +26,8 @@ def get_logistics_details(request, order_id):
     except Logistics.DoesNotExist:
         return Response({"error": "Logistics details not found"}, status=status.HTTP_404_NOT_FOUND)
 
+@swagger_auto_schema(method='put', request_body=LogisticsSerializer, 
+                     responses={200: 'OK', 400: 'Bad Request'})
 @api_view(['PUT'])
 def update_logistics_status(request, order_id):
     """

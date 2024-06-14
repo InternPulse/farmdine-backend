@@ -11,7 +11,4 @@ class VendorVerification(models.Model):
     verification_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return (
-            f"{self.user.username} - "
-            f"{'Verified' if self.is_verified else 'Not Verified'}"
-        )
+        return f"Vendor email>>> {self.user.email}"

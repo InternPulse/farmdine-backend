@@ -63,6 +63,8 @@ class LogoutSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         self.token = attrs['refresh']
+        if not self.token:
+            raise ValidationError('No refresh token provided.')
         return attrs
     
     def save(self, **kwargs):
@@ -70,6 +72,11 @@ class LogoutSerializer(serializers.Serializer):
             RefreshToken(self.token).blacklist()
         except TokenError:
             raise ValidationError('Token is invalid or expired!')
+        
+class LoginSerializer(serializers.Serializer):
+    ''' Serializer Login Data '''
+    email = serializers.EmailField()
+    password = serializers.CharField()
 
 
 

@@ -3,17 +3,29 @@ from django.db import transaction
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import CustomUserSerializer, VendorProfileSerializer, RestaurantProfileSerializer, LogoutSerializer
-from .models import CustomUser
+from drf_yasg.utils import swagger_auto_schema
+from .serializers import CustomUserSerializer, VendorProfileSerializer, RestaurantProfileSerializer, LoginSerializer, LogoutSerializer
+from .models import CustomUser, VendorProfile, RestaurantProfile
 
 class VendorRegisterView(APIView):
-    ''' Registers CustomUser and creates VendorProfile '''
+    """
+        Register a Vendor User
+
+        Registers CustomUser and creates VendorProfile. 
+        Provide data for both models simultaneously
+    """
 
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(
+        request_body=CustomUserSerializer,
+        responses={
+            201: VendorProfileSerializer,
+        }
+    )
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         # Make request.data (a QueryDict) mutable by creating a copy of it
@@ -50,19 +62,34 @@ class VendorRegisterView(APIView):
         vendor_serializer.is_valid(raise_exception=True)
         vendor_serializer.save()
 
-
-        return Response({
+        response = {
+            'success': True,
+            'status': 201,
+            'error': None,
+            'message': 'Successfully Registered Vendor User',
             'user': user_serializer.data,
             'vendor_profile': vendor_serializer.data
-        }, status=status.HTTP_201_CREATED)
+        }
+        return Response(response, status=status.HTTP_201_CREATED)
 
 
 
 class RestaurantRegisterView(APIView):
-    ''' Registers CustomUser and creates Restaurant Profile '''
+    """
+        Register a Restaurant User
+
+        Registers CustomUser and creates RestaurantProfile. 
+        Provide data for both models simultaneously
+    """
     
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(
+        request_body=CustomUserSerializer,
+        responses={
+            201: RestaurantProfileSerializer,
+        }
+    )
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         # Make request.data (a QueryDict) mutable by creating a copy of it
@@ -96,29 +123,38 @@ class RestaurantRegisterView(APIView):
         restaurant_serializer = RestaurantProfileSerializer(data=restaurant_data)
         restaurant_serializer.is_valid(raise_exception=True)
         restaurant_serializer.save()
-        context =  Response({
-                'user': user_serializer.data,
-                'restaurant_profile': restaurant_serializer.data,
-            }, status=status.HTTP_201_CREATED)
-        
-        return context
+
+        response = {
+            'success': True,
+            'status': 201,
+            'error': None,
+            'message': 'Successfully Registered Restaurant User',
+            'user': user_serializer.data,
+            'restaurant_profile': restaurant_serializer.data,
+        }
+        return Response(response, status=status.HTTP_201_CREATED)
     
 
-
 class LoginView(APIView):
-    ''' CustomUser Email Login View '''
+    """
+        User Login
 
+        User logins with their email address
+    """
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(
+        request_body=LoginSerializer,
+        responses={
+            200: 'OK',
+        }
+    )
     def post(self, request):
-        try:
-            email = request.data['email']
-            password = request.data['password']
-        except KeyError:
-            raise AuthenticationFailed('Email and password are required.')
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        if not email or not password:
-            raise AuthenticationFailed('Email and password are required.')
+        email = serializer.validated_data['email']
+        password = serializer.validated_data['password']
 
         user = CustomUser.objects.filter(email=email).first()
         
@@ -130,58 +166,150 @@ class LoginView(APIView):
         
         refresh = RefreshToken.for_user(user)
 
-        response = Response({
+        response = {
+            'success': True,
+            'status': 200,
+            'error': None,
+            'message': 'User Login Successful',
             'refresh': str(refresh),
             'access': str(refresh.access_token),
-        }, status=status.HTTP_200_OK)
-        return response
+        }
+        return Response(response, status=status.HTTP_200_OK) 
     
 
 
 class UserDetailView(APIView):
     """
-    View to retrieve, update or delete a user instance.
-    - GET: Return the details of a specific CustomUser.
-    - PUT: Update a specific CustomUser.
-    - DELETE: Delete a specific CustomUser.
+        Endpoint to retrieve, update or delete a user instance.
+
+        - GET: Return the details of a specific CustomUser.
+        - PUT: Update a specific CustomUser.
+        - DELETE: Delete a specific CustomUser.
     """
     serializer_class = CustomUserSerializer
 
     def get_object(self):
         return self.request.user
 
+
     def get(self, request, *args, **kwargs):
         user_instance = self.get_object()
         serializer = self.serializer_class(user_instance)
-        return Response(serializer.data)
+        if user_instance.is_vendor:
+            vendor_profile = VendorProfile.objects.filter(vendor=user_instance.pk).first()
+            if vendor_profile:
+                vendor_serializer = VendorProfileSerializer(vendor_profile)
+                response_data = {
+                    'success': True,
+                    'status': 200,
+                    'error': None,
+                    'message': 'GET User and Vendor Details Successful',
+                    'user': serializer.data,
+                    'vendor_details': vendor_serializer.data
+                }
+            else:
+                response_data = {
+                    'success': False,
+                    'status': 404,
+                    'error': 'Vendor profile not found',
+                    'message': 'Vendor details could not be retrieved',
+                    'user': serializer.data,
+                }  
+                return Response(response_data, status=status.HTTP_404_NOT_FOUND)              
+        
+        else:
+            restaurant_profile = RestaurantProfile.objects.filter(restaurant=user_instance.id).first()
+            if restaurant_profile:
+                restaurant_serializer = RestaurantProfileSerializer(restaurant_profile)
+                response_data = {
+                    'success': True,
+                    'status': 200,
+                    'error': None,
+                    'message': 'GET User and Restaurant Details Successful',
+                    'user': serializer.data,
+                    'restaurant_details': restaurant_serializer.data,
+                }
+            else:
+                response_data = {
+                    'success': False,
+                    'status': 404,
+                    'error': 'Restaurant profile not found',
+                    'message': 'Restaurant details could not be retrieved',
+                    'user': serializer.data,
+                }  
+                return Response(response_data, status=status.HTTP_404_NOT_FOUND)              
 
+        return Response(response_data, status=status.HTTP_200_OK)     
+
+
+    @swagger_auto_schema(request_body=CustomUserSerializer, responses={200: 'OK'})
     def put(self, request, *args, **kwargs):
-        ''' Updates Only CustomUser. Doesn't Update VendorProfile or Restaurant Profile'''
+        ''' Updates Only User data. Doesn't Update Vendor or Restaurant data '''
         user_instance = self.get_object()
         serializer = self.serializer_class(user_instance, data=request.data, partial=True)
         
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            response_data = {
+                    'success': True,
+                    'status': 200,
+                    'error': None,
+                    'message': 'User Details updated successfully',
+                    'user': serializer.data,
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    
+    @swagger_auto_schema(request_body=CustomUserSerializer, responses={204: 'No Content'})
     def delete(self, request, *args, **kwargs):
         user_instance = self.get_object()
         user_instance.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
+        response_data = {
+                'success': True,
+                'status': 204,
+                'error': None,
+                'message': 'User Deleted',
+        }
+        return Response(response_data, status=status.HTTP_204_NO_CONTENT)
 
 
 class LogoutView(generics.GenericAPIView):
-    ''' Logs user out by blacklisting their refresh_token. '''
+    """
+        User Logout
+
+        Logs user out by blacklisting their refresh token.
+    """
     serializer_class = LogoutSerializer
 
     def post(self, request):
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        
         try:
             serializer.save()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except ValidationError as e:
-            return Response(data={'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            response = {
+                'success': True,
+                'message': 'Logout successful. Token has been blacklisted.',
+                'data': None,
+                'status': status.HTTP_204_NO_CONTENT
+            }
+            return Response(response, status=status.HTTP_204_NO_CONTENT)
         
+        except ValidationError as e:
+            response = {
+                'success': False,
+                'message': 'Logout failed. Invalid token.',
+                'data': {'detail': str(e)},
+                'status': status.HTTP_400_BAD_REQUEST
+            }
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+        
+        except Exception as e:
+            response = {
+                'success': False,
+                'message': 'An unexpected error occurred.',
+                'data': {'detail': str(e)},
+                'status': status.HTTP_500_INTERNAL_SERVER_ERROR
+            }
+            return Response(response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
