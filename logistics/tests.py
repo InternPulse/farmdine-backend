@@ -17,8 +17,9 @@ class LogisticsTests(APITestCase):
     def test_get_logistics_details(self):
         url = reverse('get_logistics_details', args=[self.order.id])
         response = self.client.get(url)
+        print(response.data)  # Debugging line to print the response data
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(str(response.data['order']), str(self.order.id))
+        self.assertEqual(str(response.data['data']['order']), str(self.order.id))
 
     def test_update_logistics_status(self):
         url = reverse('update_logistics_status', args=[self.order.id])
