@@ -8,7 +8,8 @@ Utilizes Django REST Framework's @api_view decorator, serializers for validation
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Like
+from rest_framework import status
+from .models import Like 
 from .serializers import LikeSerializer
 from drf_yasg.utils import swagger_auto_schema
 
@@ -16,7 +17,6 @@ from drf_yasg.utils import swagger_auto_schema
                      responses={200: 'OK', 400: 'Bad Request'})
 @api_view(['POST'])
 def add_like(request):
-    def add_like(request):
     """
     Title: Add Like Endpoint
     
@@ -27,6 +27,20 @@ def add_like(request):
     """
     serializer = LikeSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save(user=request.user)
-        return Response(serializer.data, status=201)
-    return Response(serializer.errors, status=400)
+        like = serializer.save(user=request.user)
+        response = {
+            'success': True,
+            'status': 201,
+            'error': None,
+            'message': 'Successfully added like to the comment',
+            'data': serializer.data
+        }
+        return Response(response, status=status.HTTP_201_CREATED)
+    else:
+        response = {
+            'success': False,
+            'status': 400,
+            'error': serializer.errors,
+            'message': 'Failed to add like to the comment'
+        }
+        return Response(response, status=status.HTTP_400_BAD_REQUEST)

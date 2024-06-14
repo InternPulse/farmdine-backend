@@ -8,7 +8,9 @@ Utilizes Django REST Framework's @api_view decorator, serializers for validation
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Comment
+from rest_framework import status
+from .models import Comment, CommentLike
+from likes.models import Like
 from .serializers import CommentSerializer
 from drf_yasg.utils import swagger_auto_schema
 
@@ -26,10 +28,23 @@ def add_comment(request):
     serializer = CommentSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save(user=request.user)
-        return Response(serializer.data, status=201)
-    return Response(serializer.errors, status=400)
+        response = {
+            'success': True,
+            'status': status.HTTP_201_CREATED,
+            'error': None,
+            'message': 'Successfully Added Comment',
+            'data': serializer.data
+        }
+        return Response(response, status=status.HTTP_201_CREATED)
+    response = {
+        'success': False,
+        'status': status.HTTP_400_BAD_REQUEST,
+        'error': serializer.errors,
+        'message': 'Failed to Add Comment'
+    }
+    return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
-@swagger_auto_schema(method='post', request_body=CommentSerializer, 
+@swagger_auto_schema(method='post', request_body=None, 
                      responses={200: 'OK', 400: 'Bad Request'})
 @api_view(['POST'])
 def add_like_to_comment(request, comment_id):
@@ -40,8 +55,38 @@ def add_like_to_comment(request, comment_id):
     Creates a new like associated with the comment and the requesting user.
     Returns a success message if the like is added successfully.
     """
-    comment = Comment.objects.get(pk=comment_id)
-    # Assuming you have authentication implemented to get the user making the request
-    like = comment.likes.create(user=request.user)
-    like.save()
-    return Response({'message': 'Like added successfully'}, status=201)
+    try:
+        print("add_like_to_comment called")  
+        comment = Comment.objects.get(pk=comment_id)
+        print(f"Comment found: {comment}") 
+        like = Like.objects.create(comment=comment, user=request.user)
+        like.save()
+        response = {
+            'success': True,
+            'status': status.HTTP_201_CREATED,
+            'error': None,
+            'message': 'Like added successfully',
+            'data': {
+                'comment_id': comment_id,
+                'user_id': request.user.id
+            }
+        }
+        return Response(response, status=status.HTTP_201_CREATED)
+    except Comment.DoesNotExist:
+        print("Comment not found") 
+        response = {
+            'success': False,
+            'status': status.HTTP_404_NOT_FOUND,
+            'error': 'Comment not found',
+            'message': 'Failed to add like'
+        }
+        return Response(response, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        print(f"Exception: {e}")
+        response = {
+            'success': False,
+            'status': status.HTTP_400_BAD_REQUEST,
+            'error': str(e),
+            'message': 'Failed to add like'
+        }
+        return Response(response, status=status.HTTP_400_BAD_REQUEST)
