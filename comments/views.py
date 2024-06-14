@@ -1,11 +1,3 @@
-"""
-Title: Comment API Endpoints for Adding Comments and Likes
-
-Description:
-Defines API endpoints for adding comments and likes to comments. 
-Utilizes Django REST Framework's @api_view decorator, serializers for validation, and Swagger auto-schema for documentation.
-"""
-
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -18,13 +10,6 @@ from drf_yasg.utils import swagger_auto_schema
                      responses={200: 'OK', 400: 'Bad Request'})
 @api_view(['POST'])
 def add_comment(request):
-    """
-    Add Comment Endpoint
-
-    Handles POST requests to add a comment. Validates input data using CommentSerializer
-    and saves the comment with the requesting user. Returns appropriate response with 
-    serialized data on success or errors on validation failure.
-    """
     serializer = CommentSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save(user=request.user)

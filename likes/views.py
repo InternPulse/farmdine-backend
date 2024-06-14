@@ -1,11 +1,3 @@
-"""
-Title: Like API Endpoint for Adding Likes to Comments
-
-Description:
-Defines an API endpoint for adding likes to comments. 
-Utilizes Django REST Framework's @api_view decorator, serializers for validation, and Swagger auto-schema for documentation.
-"""
-
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status

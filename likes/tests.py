@@ -1,9 +1,3 @@
-"""
-Likes App Tests
-
-Defines the test cases for the Likes app.
-"""
-
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
@@ -16,9 +10,7 @@ CustomUser = get_user_model()
 
 
 class LikeAPITest(TestCase):
-    """
-    Test cases for the Like API endpoints.
-    """
+    """Test cases for the Like API endpoints."""
 
     @classmethod
     def setUpTestData(cls):
