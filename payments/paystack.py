@@ -12,9 +12,9 @@ headers = {
 def make_payment(payment):
     url = base_url + "initialize"
     data = {
-        "email": payment.email,
-        "amount": int(payment.payment_amount * 100),  # Paystack expects amount in kobo
-        "reference": str(payment.id),
+        "email": payment["email"],
+        "amount": int(float(payment["payment_amount"]) * 100),  # Paystack expects amount in kobo
+        "reference": str(payment["id"]),
     }
     response = requests.post(url, headers=headers, json=data)
     return response
