@@ -1,6 +1,7 @@
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet 
 from rest_framework.views import APIView
+from rest_framework.decorators import permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
@@ -19,8 +20,8 @@ class ProductCreateView(ModelViewSet):
     parser_classes = (MultiPartParser, FormParser)
     http_method_names = ['post']
     
-    def post(request):
-        if request.user.vendor:
+    def create(self, request):
+        if not request.user.is_vendor:
             response_data = {
                 "success": False,
                 "status": 403,
@@ -31,14 +32,14 @@ class ProductCreateView(ModelViewSet):
         data = request.data
         serializer = ProductSerializer(data=data)
         if serializer.is_valid():
-            product = Product.objects.create(**data, user=request.user)
-            product.save()
+            product = serializer.save(user=request.user)
+            res = ProductSerializer(product, many=False)
             response_data = {
                 "success": True,
                 "status": 201,
                 "error": None,
                 "message": "product successfully added",
-                "data": serializer.data
+                "data": res.data
             }
             return Response(response_data, status=status.HTTP_201_CREATED)
         else:
@@ -57,6 +58,7 @@ class ProductListView(ModelViewSet):
     permission_classes = [AllowAny]
 
 
+@permission_classes([AllowAny])
 class ProductDetailView(APIView):
     """
         Get product details
@@ -93,16 +95,16 @@ class ProductUpdateView(APIView):
 
             Update all information about a specific product
         """
-        if product.user != request.user:
-            response_data = {
-                "success": False,
-                "status": 403,
-                "error": "you do not have permission to update this product",
-                "message": None,
-            }
-            return Response(response_data, status=status.HTTP_403_FORBIDDEN)
         try:
             product = Product.objects.get(id=product_id)
+            if product.user != request.user:
+                response_data = {
+                    "success": False,
+                    "status": 403,
+                    "error": "you do not have permission to update this product",
+                    "message": None,
+                }
+                return Response(response_data, status=status.HTTP_403_FORBIDDEN)
             serializer = ProductSerializer(product, data=request.data)
             if serializer.is_valid():
                 serializer.save()
@@ -130,16 +132,16 @@ class ProductUpdateView(APIView):
 
             Update some information about a specific product
         """
-        if product.user != request.user:
-            response_data = {
-                "success": False,
-                "status": 403,
-                "error": "you do not have permission to update this product",
-                "message": None,
-            }
-            return Response(response_data, status=status.HTTP_403_FORBIDDEN)
         try:
             product = Product.objects.get(id=product_id)
+            if product.user != request.user:
+                response_data = {
+                    "success": False,
+                    "status": 403,
+                    "error": "you do not have permission to update this product",
+                    "message": None,
+                }
+                return Response(response_data, status=status.HTTP_403_FORBIDDEN)
             serializer = ProductSerializer(product, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
@@ -169,16 +171,16 @@ class ProductDeleteView(APIView):
         Delete a specific product from the list
     """
     def delete(self, request, product_id):
-        if product.user != request.user:
-            response_data = {
-                "success": False,
-                "status": 403,
-                "error": "you do not have permission to delete this product",
-                "message": None,
-            }
-            return Response(response_data, status=status.HTTP_403_FORBIDDEN)
         try:
             product = Product.objects.get(id=product_id)
+            if product.user != request.user:
+                response_data = {
+                    "success": False,
+                    "status": 403,
+                    "error": "you do not have permission to delete this product",
+                    "message": None,
+                }
+                return Response(response_data, status=status.HTTP_403_FORBIDDEN)
             product.delete()
             response_data = {
                 "success": True,

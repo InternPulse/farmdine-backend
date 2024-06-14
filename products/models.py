@@ -28,7 +28,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.IntegerField()
     image = models.ImageField(upload_to="farmdine/product_images/", null=True, blank=True)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     
 

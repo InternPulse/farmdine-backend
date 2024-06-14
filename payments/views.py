@@ -2,7 +2,7 @@ from rest_framework import status, generics
 from rest_framework.response import Response
 from .models import Payment
 from .serializers import PaymentSerializer
-from cart.serializers import Cart
+from cart.serializers import Cart, CartItems
 from .paystack import make_payment, verify_payment
 
 
@@ -19,19 +19,23 @@ class MakePaymentView(generics.CreateAPIView):
         serializer = PaymentSerializer(data=data)
         if serializer.is_valid():
             try:
-                cart = Cart.objects.get(id=data['cart_id'])
+                cart = Cart.objects.get(user=request.user)
+                cart_items = CartItems.objects.filter(cart=cart)
+                total_price = sum(item.item_total_price for item in cart_items)
                 # save payment data
-                payment = Payment.objects.create(**data, cart=cart, payment_amount=data['payment_amount'])
+                payment = serializer.save(cart=cart, payment_amount=total_price)
+                res = PaymentSerializer(payment, many=False)
 
                 # call the make_payment function
-                payment_res = make_payment(payment)
+                payment_res = make_payment(res.data)
                 if payment_res.status_code == 200:
                     response_data = {
                         "success": True,
                         "status": 200,
                         "error": None,
                         "message": "Payment initialized successfully",
-                        "data": payment_res.json()
+                        "checkout_url": payment_res.json(),
+                        "payment": res.data
                     }
                     return Response(response_data, status=status.HTTP_200_OK)
                 else:
@@ -76,7 +80,7 @@ class VerifyPaymentView(generics.ListAPIView):
                     "status": 200,
                     "error": None,
                     "message": "Payment verified successfully",
-                    "data": data['data']
+                    "payment": data['data']
                 }
                 return Response(response_data, status=status.HTTP_200_OK)
             response_data = {
@@ -84,7 +88,7 @@ class VerifyPaymentView(generics.ListAPIView):
                 "status": 402,
                 "error": "Payment is yet to be made",
                 "message": None,
-                "data": data['data']
+                "payment": data['data']
             }
             return Response(response_data, status=status.HTTP_402_PAYMENT_REQUIRED)
         response_data = {
